@@ -185,17 +185,20 @@ print(f"Kitchen readings: {len(df)} rows")
 print(df.head(10))
 ```
 
-Use EXPLAIN to see the pruning:
+You can also use `read_from_frame()` with `partition_filter` to read a specific partition directly, bypassing SQL:
 
 ```python
-result_bytes = ap.sql("""
-    EXPLAIN SELECT * FROM building.sensors.temperature WHERE room = 'kitchen'
-""")
+# Read only the kitchen partition via the SDK
+result_bytes = ap.read_from_frame(
+    "building", "sensors", "temperature",
+    partition_filter={"room": "kitchen"}
+)
 reader = pa.ipc.open_stream(result_bytes)
-print(reader.read_all().to_pandas())
+df = reader.read_all().to_pandas()
+print(f"Kitchen readings (via partition filter): {len(df)} rows")
 ```
 
-The plan shows that only cells in the `room=kitchen` partition are scanned.
+In both cases, only cells in the `room=kitchen` partition are read from storage. The other partitions are never touched.
 
 ## Step 7: Combine Filters
 
@@ -226,7 +229,7 @@ print("Tutorial complete!")
 - **Multiple writes** create additional cells within each partition
 - **Aggregation queries** (AVG, MIN, MAX, COUNT) work with GROUP BY
 - **DESCRIBE** shows frame schema, partition columns, and statistics
-- **Partition pruning** skips entire directories of data that don't match the WHERE clause
+- **Partition pruning** skips entire directories of data that don't match the WHERE clause (via SQL `WHERE` or `partition_filter` in `read_from_frame()`)
 - **Cell statistics** enable further pruning within a partition based on min/max values
 
 ## Next Steps

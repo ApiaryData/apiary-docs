@@ -20,7 +20,27 @@ cargo build --workspace --release
 
 The binary is located at `target/release/apiary-cli`.
 
-## Commands
+## Current v1 Commands
+
+In v1, the CLI binary prints version information and directs users to the Python SDK:
+
+```bash
+apiary-cli
+```
+
+```
+apiary v1.0.0
+CLI not yet implemented. Use the Python SDK.
+See: https://apiarydata.github.io/apiary-docs/docs/reference/python-sdk
+```
+
+All data operations, queries, and cluster management are performed through the [Python SDK](/docs/reference/python-sdk).
+
+## Planned v2 Commands
+
+:::info Planned for v2
+The following commands are planned for the v2 release. They are listed here to preview the intended CLI surface.
+:::
 
 ### `apiary start`
 
@@ -35,26 +55,12 @@ apiary start [OPTIONS]
 | `--storage <URI>` | Storage backend URI | Local filesystem (`~/.apiary/data/`) |
 | `--name <NAME>` | Apiary instance name | `default` |
 
-```bash
-# Solo mode with local storage
-apiary start --name my_project
-
-# Multi-node with MinIO
-apiary start --name production --storage s3://apiary-data@minio.local:9000
-```
-
 ### `apiary sql`
 
 Execute a SQL query against a running Apiary instance.
 
 ```bash
 apiary sql "<QUERY>"
-```
-
-```bash
-apiary sql "SELECT * FROM warehouse.sales.orders LIMIT 10"
-apiary sql "SHOW HIVES"
-apiary sql "DESCRIBE warehouse.sales.orders"
 ```
 
 ### `apiary shell`
@@ -68,9 +74,3 @@ apiary shell [OPTIONS]
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--storage <URI>` | Storage backend URI | Local filesystem |
-
-```bash
-apiary shell --storage s3://apiary-data@minio.local:9000
-```
-
-The shell supports all SQL statements documented in the [SQL Reference](/docs/reference/sql-reference), including `USE`, `SHOW`, and `DESCRIBE`.

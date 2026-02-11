@@ -1,7 +1,7 @@
 ---
 title: Configure Storage Backends
 sidebar_position: 7
-description: "How to configure local filesystem, MinIO, AWS S3, and GCS storage backends."
+description: "How to configure local filesystem, MinIO, AWS S3, and GCS (via S3 compatibility) storage backends."
 ---
 
 # Configure Storage Backends
@@ -100,7 +100,9 @@ ap.start()
 ap = Apiary("production", storage="s3://my-apiary-bucket/apiary?region=eu-west-1")
 ```
 
-## Google Cloud Storage
+## Google Cloud Storage (via S3 Compatibility)
+
+Apiary does not natively support `gs://` URIs. However, GCS provides an [S3-compatible endpoint](https://cloud.google.com/storage/docs/interoperability) that works with Apiary's S3 backend.
 
 ### Create a Bucket
 
@@ -108,10 +110,22 @@ ap = Apiary("production", storage="s3://my-apiary-bucket/apiary?region=eu-west-1
 gsutil mb gs://my-apiary-bucket
 ```
 
+### Generate HMAC Keys
+
+Create S3-compatible HMAC credentials for your GCS bucket:
+
+```bash
+gsutil hmac create your-service-account@project.iam.gserviceaccount.com
+```
+
+This returns an access key and secret key.
+
 ### Configure Credentials
 
 ```bash
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account-key.json
+export AWS_ACCESS_KEY_ID=GOOG...        # HMAC access key
+export AWS_SECRET_ACCESS_KEY=...         # HMAC secret key
+export AWS_ENDPOINT_URL=https://storage.googleapis.com
 ```
 
 ### Connect Apiary
@@ -119,9 +133,11 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account-key.json
 ```python
 from apiary import Apiary
 
-ap = Apiary("production", storage="gs://my-apiary-bucket/apiary")
+ap = Apiary("production", storage="s3://my-apiary-bucket/apiary")
 ap.start()
 ```
+
+Note the `s3://` URI scheme -- this routes through the S3-compatible endpoint.
 
 ## Verify the Storage Backend
 
@@ -143,4 +159,4 @@ print(ap.list_hives())  # ["test"]
 | Local filesystem | Development, solo mode | < 1 ms | Depends on disk | No |
 | MinIO | Self-hosted multi-node | 5-20 ms (LAN) | Depends on config | Yes |
 | AWS S3 | Cloud production | 20-200 ms | 99.999999999% | Yes |
-| GCS | Google Cloud production | 20-200 ms | 99.999999999% | Yes |
+| GCS (via S3 compat) | Google Cloud production | 20-200 ms | 99.999999999% | Yes |

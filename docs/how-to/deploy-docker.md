@@ -39,7 +39,8 @@ COPY crates/ crates/
 
 RUN pip install maturin && maturin develop --release
 
-EXPOSE 8080
+# Expose port for future HTTP API (v2 -- not active in v1)
+# EXPOSE 8080
 CMD ["python", "-c", "from apiary import Apiary; ap = Apiary('apiary', storage='${APIARY_STORAGE}'); ap.start(); import signal; signal.pause()"]
 ```
 

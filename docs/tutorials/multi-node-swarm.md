@@ -218,17 +218,14 @@ reader = pa.ipc.open_stream(result_bytes)
 print(reader.read_all().to_pandas())
 ```
 
-The query planner distributes cells across available nodes based on cache locality and capacity. Use EXPLAIN ANALYZE to see how cells were distributed:
+The query planner distributes cells across available nodes based on cache locality and capacity. You can observe the distribution by checking swarm status while queries are running:
 
 ```python
-result_bytes = ap.sql("""
-    EXPLAIN ANALYZE
-    SELECT country, COUNT(*)
-    FROM analytics.events.clicks
-    GROUP BY country
-""")
-reader = pa.ipc.open_stream(result_bytes)
-print(reader.read_all().to_pandas())
+# Check swarm status to see node utilization
+swarm = ap.swarm_status()
+for node in swarm['nodes']:
+    print(f"  {node['node_id']}: {node['state']} "
+          f"(bees: {node['bees']}, idle: {node['idle_bees']})")
 ```
 
 ## Step 7: Add a Fourth Node

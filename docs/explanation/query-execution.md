@@ -76,31 +76,11 @@ Workers:
 
 Each worker receives a SQL fragment -- a self-contained SQL query that operates on a subset of cells. The coordinator does not serialize physical plans; it generates SQL strings.
 
-For example, given the query:
+In v1, the SQL fragment is the original query passed through as-is to each worker, scoped to that worker's assigned cells. Each worker executes the full query on its local subset.
 
-```sql
-SELECT region, AVG(amount) FROM warehouse.sales.orders GROUP BY region
-```
-
-Worker A (assigned partition `region=north`) receives:
-
-```sql
-SELECT region, SUM(amount) AS _sum, COUNT(amount) AS _count
-FROM warehouse.sales.orders
-WHERE region = 'north'
-GROUP BY region
-```
-
-Worker B (assigned partition `region=south`) receives:
-
-```sql
-SELECT region, SUM(amount) AS _sum, COUNT(amount) AS _count
-FROM warehouse.sales.orders
-WHERE region = 'south'
-GROUP BY region
-```
-
-The coordinator merges partial results: `AVG = total_sum / total_count`.
+:::info Planned for v2
+**Aggregation decomposition** (e.g., rewriting `AVG(x)` into partial `SUM(x)` / `COUNT(x)` on workers, then merging at the coordinator) is planned for v2. In v1, each worker runs the original SQL independently on its cell subset, and the coordinator merges the raw result sets.
+:::
 
 ### Why SQL Fragments Instead of Physical Plans?
 
@@ -114,29 +94,16 @@ The cost is re-parsing and re-planning on each worker. For v1's batch workloads,
 
 ## EXPLAIN and EXPLAIN ANALYZE
 
-Apiary supports `EXPLAIN` to view the query plan and `EXPLAIN ANALYZE` to view the plan with execution statistics:
+:::info Planned for v2
+`EXPLAIN` and `EXPLAIN ANALYZE` support is planned for v2. In the current release, query plan inspection is not available through SQL.
 
-```sql
-EXPLAIN SELECT region, AVG(amount) FROM warehouse.sales.orders GROUP BY region;
-```
+The planned v2 implementation will include:
 
-Output includes:
+- **EXPLAIN:** Logical plan, physical plan, cell pruning results, and partition elimination results
+- **EXPLAIN ANALYZE:** Execution time per operator, rows processed, bytes read from storage vs. cache, and memory used per bee
 
-- Logical plan (DataFusion's optimized logical plan)
-- Physical plan (execution operators)
-- Cell pruning results (cells examined, cells pruned, cells scanned)
-- Partition elimination results
-
-```sql
-EXPLAIN ANALYZE SELECT region, AVG(amount) FROM warehouse.sales.orders GROUP BY region;
-```
-
-Additionally shows:
-
-- Execution time per operator
-- Rows processed
-- Bytes read from storage vs. cache
-- Memory used per bee
+In v1, you can observe partition pruning indirectly by using `read_from_frame()` with `partition_filter` to read a specific partition, or by comparing query times on partitioned vs. unpartitioned data.
+:::
 
 ## Query Timeouts and Abandonment
 
