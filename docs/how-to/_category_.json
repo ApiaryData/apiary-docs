@@ -1,0 +1,8 @@
+{
+  "label": "How-to Guides",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Task-oriented practical guides. Find the steps you need to accomplish a specific goal."
+  }
+}

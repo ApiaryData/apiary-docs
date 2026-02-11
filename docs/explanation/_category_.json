@@ -1,0 +1,8 @@
+{
+  "label": "Explanation",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Understanding-oriented discussions of Apiary's architecture, design decisions, and roadmap."
+  }
+}
