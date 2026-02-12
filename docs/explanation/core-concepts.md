@@ -16,7 +16,7 @@ This is not a metaphor. Apiary's runtime algorithms are directly inspired by doc
 
 - **Mason bees** build isolated chambers for their offspring. Apiary uses sealed execution chambers per CPU core with hard memory boundaries.
 - **Leafcutter bees** cut materials to precisely fit their nests. Apiary sizes data cells to fit each node's memory budget.
-- **Colonies regulate temperature** through collective behavior. Apiary uses a composite health metric that drives write backpressure.
+- **Colonies regulate temperature** through collective behavior. Apiary uses a composite health metric that monitors system load and reports it to clients.
 - **Bees abandon unproductive food sources** after repeated failures. Apiary abandons poison-pill tasks after a configurable retry limit.
 
 The biological model provides a unified framework for resource management decisions that would otherwise be a collection of ad-hoc heuristics.

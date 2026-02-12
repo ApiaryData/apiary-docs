@@ -47,7 +47,7 @@ v1 proves the fundamental thesis: a distributed data platform can run on Raspber
 - Mason bee sealed chambers (memory-budgeted isolation per core)
 - Leafcutter cell sizing (cells fit bee budgets)
 - Task abandonment (retry limits with diagnostics)
-- Colony temperature (composite health metric driving backpressure)
+- Colony temperature (composite health metric for system monitoring)
 
 ### v1 Design Constraints
 

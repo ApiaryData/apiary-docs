@@ -68,8 +68,8 @@ Temperature ranges:
 - **Cold** (0.0-0.3) -- System underutilized
 - **Ideal** (0.3-0.7) -- Normal operating range
 - **Warm** (0.7-0.85) -- Approaching capacity
-- **Hot** (0.85-0.95) -- Write backpressure active
-- **Critical** (0.95-1.0) -- Query admission restricted
+- **Hot** (0.85-0.95) -- Consider reducing write load (v2: automatic backpressure)
+- **Critical** (0.95-1.0) -- Investigate immediately (v2: query admission control)
 
 ## Create a Monitoring Script
 
@@ -95,7 +95,7 @@ while True:
 
     # Alert on high temperature
     if colony['temperature'] > 0.85:
-        print("  WARNING: Colony temperature is HOT — write backpressure active")
+        print("  WARNING: Colony temperature is HOT — consider reducing write load")
 
     # Alert on dead nodes
     dead_nodes = [n for n in swarm['nodes'] if n['state'] == 'dead']

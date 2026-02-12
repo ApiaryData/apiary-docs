@@ -197,7 +197,7 @@ Use Azure Blob Storage with the S3-compatible endpoint, or GCS-compatible storag
 
 ### Google Cloud Run
 
-Use GCS as the storage backend: `APIARY_STORAGE=gs://your-bucket/apiary`.
+Use GCS as the storage backend via its S3-compatible endpoint. Set `AWS_ENDPOINT_URL=https://storage.googleapis.com` and use GCS HMAC credentials with `s3://` URIs. See [Configure Storage Backends](/docs/how-to/configure-storage-backends#google-cloud-storage-via-s3-compatibility) for details.
 
 ## Verify
 
@@ -207,7 +207,4 @@ kubectl get pods -n apiary
 
 # Check logs
 kubectl logs -n apiary deployment/apiary
-
-# Port-forward to connect from your machine
-kubectl port-forward -n apiary deployment/apiary 8080:8080
 ```

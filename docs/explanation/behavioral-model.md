@@ -96,18 +96,24 @@ The temperature drives system behavior:
 |-------|---------------|-----------------|
 | 0.0 -- 0.3 | Cold | System underutilized; no restrictions |
 | 0.3 -- 0.7 | Ideal | Normal operating range |
-| 0.7 -- 0.85 | Warm | Approaching capacity; schedule compaction |
-| 0.85 -- 0.95 | Hot | Write backpressure applied; block new writes |
-| 0.95 -- 1.0 | Critical | Query admission restricted |
+| 0.7 -- 0.85 | Warm | Approaching capacity; maintenance may be deferred |
+| 0.85 -- 0.95 | Hot | Temperature reported to clients via `colony_status()` and `WriteResult` |
+| 0.95 -- 1.0 | Critical | Temperature reported to clients; operators should investigate |
 
-**Write backpressure:** When temperature exceeds 0.85, new writes block until temperature drops or a timeout is reached (default: 30 seconds). This prevents overwhelming a constrained system with more work than it can process.
+In v1, colony temperature is an **observability signal**. It is measured and reported to clients in `colony_status()` and in every `WriteResult`, allowing applications and operators to make informed decisions. Active enforcement (write backpressure and query admission control) is planned for v2.
+
+:::info Planned for v2
+In v2, the Hot and Critical states will actively enforce backpressure:
+- **Hot (0.85--0.95):** New writes will block until temperature drops or a timeout is reached.
+- **Critical (0.95--1.0):** Query admission will be restricted.
+:::
 
 ## Behavior Interactions
 
 The four v1 behaviors form an interconnected system:
 
 ```
-Colony Temperature → Write backpressure → Controls ingest rate
+Colony Temperature → Temperature reporting → Informs ingest decisions
        ↑                                         │
        │                                         ↓
   Mason Chambers → Memory isolation → Prevents cascading OOM
@@ -121,7 +127,7 @@ Colony Temperature → Write backpressure → Controls ingest rate
        └─────────── Lowers temperature ←─────────┘
 ```
 
-Temperature rises when bees are busy. If a task fails repeatedly and is abandoned, it frees the bee, which lowers temperature. Leafcutter sizing ensures cells fit within mason chambers. Write backpressure prevents temperature from rising too fast.
+Temperature rises when bees are busy. If a task fails repeatedly and is abandoned, it frees the bee, which lowers temperature. Leafcutter sizing ensures cells fit within mason chambers. Temperature reporting enables applications to implement their own backpressure logic in v1; active enforcement is planned for v2.
 
 ## v2 and Beyond
 

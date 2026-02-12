@@ -44,7 +44,7 @@ Each entry records one action:
 
 - **CreateFrame** -- Initial frame creation with schema and partition columns
 - **AddCells** -- Appending new data (one or more Parquet cells)
-- **RewriteCells** -- Replacing cells during compaction or overwrite (removes old cells, adds new ones)
+- **RewriteCells** -- Replacing cells during an overwrite operation (removes old cells, adds new ones)
 
 Every cell in an AddCells or RewriteCells entry carries metadata: path, row count, byte size, partition values, and column-level min/max statistics.
 
@@ -148,7 +148,11 @@ Parquet is columnar. When a query selects specific columns, only those column ch
 
 ## Compaction
 
-Over time, a frame accumulates many small cells from individual writes. Compaction merges them into fewer, larger cells:
+:::info Planned for v2
+Automatic compaction is planned for v2. In v1, you can use `overwrite_frame()` to manually rewrite a frame's data into optimally-sized cells. The `RewriteCells` ledger action that compaction will use already exists and is used by `overwrite_frame()`.
+:::
+
+Over time, a frame accumulates many small cells from individual writes. Compaction will merge them into fewer, larger cells:
 
 1. Identify a partition meeting compaction criteria (> 10 cells, or cells older than 1 hour)
 2. Read all small cells from object storage

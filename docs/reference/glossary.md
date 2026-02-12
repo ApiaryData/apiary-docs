@@ -36,7 +36,7 @@ A sealed execution environment for a single [bee](#bee). Also called a **mason b
 
 ### Colony Temperature
 
-A composite health metric for the entire node, ranging from 0.0 (cold) to 1.0 (critical). Derived from CPU utilization, memory pressure, and task queue depth. Controls write backpressure and query admission. See [Configuration: Colony Temperature](/docs/reference/configuration#colony-temperature).
+A composite health metric for the entire node, ranging from 0.0 (cold) to 1.0 (critical). Derived from CPU utilization, memory pressure, and task queue depth. Reported to clients via `colony_status()` and `WriteResult` for monitoring and application-level decisions. Active enforcement (write backpressure, query admission control) is planned for v2. See [Configuration: Colony Temperature](/docs/reference/configuration#colony-temperature).
 
 ### Conditional Write
 

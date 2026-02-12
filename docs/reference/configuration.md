@@ -22,7 +22,10 @@ The `Apiary` constructor accepts two parameters:
 | `None` / omitted | Local filesystem | `Apiary("mydb")` -- stores at `~/.apiary/mydb/` |
 | `s3://bucket/path` | AWS S3 | `Apiary("prod", storage="s3://my-bucket/apiary")` |
 | `s3://bucket/path?endpoint=http://host:port` | MinIO / S3-compatible | `Apiary("prod", storage="s3://data@minio.local:9000")` |
-| `gs://bucket/path` | Google Cloud Storage | `Apiary("prod", storage="gs://my-bucket/apiary")` |
+
+:::note
+Google Cloud Storage is supported via its [S3-compatible endpoint](https://cloud.google.com/storage/docs/interoperability). Use `s3://` URIs with GCS HMAC credentials and `AWS_ENDPOINT_URL=https://storage.googleapis.com`. Native `gs://` URIs are not supported in v1.
+:::
 
 ---
 
@@ -91,8 +94,8 @@ RUST_LOG=info,apiary_storage=trace
 | 0.0 -- 0.3 | Cold | System underutilized |
 | 0.3 -- 0.7 | Ideal | Normal operating range |
 | 0.7 -- 0.85 | Warm | Approaching capacity |
-| 0.85 -- 0.95 | Hot | Write backpressure applied |
-| 0.95 -- 1.0 | Critical | Queries may be rejected |
+| 0.85 -- 0.95 | Hot | Temperature reported to client (v2: write backpressure) |
+| 0.95 -- 1.0 | Critical | Temperature reported to client (v2: query admission control) |
 
 Colony temperature is a composite metric derived from CPU utilization, memory pressure, and task queue depth.
 
@@ -104,6 +107,10 @@ Colony temperature is a composite metric derived from CPU utilization, memory pr
 | Retry policy | Immediate | Failed tasks are re-queued immediately |
 
 ### Compaction
+
+:::info Planned for v2
+Automatic compaction is not implemented in v1. The following parameters describe the planned v2 compaction behavior. In v1, use `overwrite_frame()` to manually consolidate a frame's data.
+:::
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
