@@ -7,8 +7,8 @@ const config: Config = {
   tagline: 'A distributed data processing framework inspired by bee colony intelligence',
   favicon: 'img/favicon.ico',
 
-  url: 'https://apiarydata.github.io',
-  baseUrl: '/apiary-docs/',
+  url: 'https://apiaryio.com',
+  baseUrl: '/',
 
   organizationName: 'ApiaryData',
   projectName: 'apiary-docs',
