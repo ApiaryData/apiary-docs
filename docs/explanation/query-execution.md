@@ -107,7 +107,7 @@ In v1, you can observe partition pruning indirectly by using `read_from_frame()`
 
 ## Query Timeouts and Abandonment
 
-Each query task has a timeout (default: 300 seconds). If a worker does not produce a partial result within the timeout:
+Each query task has a timeout (default: 30 seconds). If a worker does not produce a partial result within the timeout:
 
 1. The coordinator marks the task as failed
 2. The task is reassigned to another worker (up to 3 retries)
@@ -125,7 +125,9 @@ In addition to standard SQL, Apiary supports custom commands:
 | `USE BOX name` | Set current box context | Confirmation |
 | `SHOW HIVES` | List all hives | Table of hive names |
 | `SHOW BOXES IN hive` | List boxes in a hive | Table of box names |
+| `SHOW BOXES` | List boxes in current hive (requires `USE HIVE`) | Table of box names |
 | `SHOW FRAMES IN hive.box` | List frames in a box | Table of frame names |
+| `SHOW FRAMES` | List frames in current box (requires `USE HIVE` + `USE BOX`) | Table of frame names |
 | `DESCRIBE hive.box.frame` | Show frame schema and stats | Schema with metadata |
 
 These commands are intercepted before reaching DataFusion and handled by the Apiary query layer directly.

@@ -26,10 +26,14 @@ This documentation follows the [Diataxis framework](https://diataxis.fr/), which
 **Task-oriented.** Practical steps for accomplishing specific goals. You know what you want to do; these show you how.
 
 - [Install Apiary](/docs/how-to/install-apiary)
+- [Install on Windows](/docs/how-to/install-windows)
 - [Write and Query Data](/docs/how-to/write-and-query-data)
 - [Deploy on Raspberry Pi](/docs/how-to/deploy-raspberry-pi)
 - [Deploy with Docker](/docs/how-to/deploy-docker)
+- [Deploy Pi Profiles](/docs/how-to/deploy-pi-profiles)
 - [Monitor Swarm Health](/docs/how-to/monitor-swarm-health)
+- [Troubleshooting](/docs/how-to/troubleshooting)
+- [Contributing](/docs/how-to/contributing)
 
 ### Reference
 
@@ -38,6 +42,8 @@ This documentation follows the [Diataxis framework](https://diataxis.fr/), which
 - [Python SDK Reference](/docs/reference/python-sdk)
 - [SQL Reference](/docs/reference/sql-reference)
 - [Configuration](/docs/reference/configuration)
+- [Error Reference](/docs/reference/errors)
+- [Benchmarks](/docs/reference/benchmarks)
 - [Glossary](/docs/reference/glossary)
 
 ### Explanation
@@ -54,7 +60,10 @@ This documentation follows the [Diataxis framework](https://diataxis.fr/), which
 | I want to... | Go to... |
 |---|---|
 | Get started for the first time | [Your First Apiary](/docs/tutorials/your-first-apiary) |
+| Install on Windows | [Install on Windows](/docs/how-to/install-windows) |
 | Look up a Python SDK method | [Python SDK Reference](/docs/reference/python-sdk) |
 | Deploy on a Raspberry Pi | [Deploy on Raspberry Pi](/docs/how-to/deploy-raspberry-pi) |
 | Understand the architecture | [Architecture Overview](/docs/explanation/architecture-overview) |
 | Set up multiple nodes | [Multi-Node Swarm Tutorial](/docs/tutorials/multi-node-swarm) |
+| Fix an error | [Troubleshooting](/docs/how-to/troubleshooting) |
+| Contribute to the project | [Contributing](/docs/how-to/contributing) |

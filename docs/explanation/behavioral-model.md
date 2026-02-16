@@ -20,7 +20,7 @@ v1 implements four behaviors. An additional sixteen are planned for v2 and beyon
 
 - **Memory budget.** Hard limit on memory allocated to this bee. On a 4 GB Pi with 4 cores, each bee gets ~1 GB. Exceeding the budget fails the task, not the node.
 - **Scratch directory isolation.** Each bee has its own temporary directory for spill files. One bee's disk usage does not interfere with others.
-- **Task timeout.** Each task has a maximum execution time (default: 300 seconds). A runaway query is terminated without affecting other bees.
+- **Task timeout.** Each task has a maximum execution time (default: 30 seconds). A runaway query is terminated without affecting other bees.
 
 The key property is **blast-radius containment**. A malformed query that causes an out-of-memory condition kills one bee's task. The other bees continue operating, and the failed task is retried (possibly on a different node).
 
@@ -97,8 +97,8 @@ The temperature drives system behavior:
 | 0.0 -- 0.3 | Cold | System underutilized; no restrictions |
 | 0.3 -- 0.7 | Ideal | Normal operating range |
 | 0.7 -- 0.85 | Warm | Approaching capacity; maintenance may be deferred |
-| 0.85 -- 0.95 | Hot | Temperature reported to clients via `colony_status()` and `WriteResult` |
-| 0.95 -- 1.0 | Critical | Temperature reported to clients; operators should investigate |
+| > 0.85 -- 0.95 | Hot | Temperature reported to clients via `colony_status()` and `WriteResult` |
+| > 0.95 | Critical | Temperature reported to clients; operators should investigate |
 
 In v1, colony temperature is an **observability signal**. It is measured and reported to clients in `colony_status()` and in every `WriteResult`, allowing applications and operators to make informed decisions. Active enforcement (write backpressure and query admission control) is planned for v2.
 

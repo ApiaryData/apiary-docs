@@ -74,7 +74,11 @@ create_box(hive: str, name: str) -> None
 create_frame(hive: str, box_name: str, name: str, schema: dict, partition_by: list[str] | None = None) -> None
 ```
 
-**Traditional aliases:** `create_database()`, `create_schema()`, `create_table()` accept the same signatures.
+**Traditional aliases:** `create_database()`, `create_schema()`, `create_table()` accept the same signatures. Note that `create_table()` uses `columns` as the parameter name instead of `schema`:
+
+```python
+create_table(database: str, schema: str, name: str, columns: dict, partition_by: list[str] | None = None) -> None
+```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -121,17 +125,15 @@ get_frame(hive: str, box_name: str, name: str) -> dict
 
 **Traditional alias:** `get_table()`
 
-Returns frame metadata including schema, partition columns, cell count, row count, and byte size.
+Returns frame metadata including schema, partition columns, max partitions, and creation timestamp.
 
 ```python
 info = ap.get_frame("warehouse", "sales", "orders")
 # {
-#   "name": "orders",
 #   "schema": {"order_id": "int64", "customer": "utf8", ...},
 #   "partition_by": ["region"],
-#   "cell_count": 3,
-#   "row_count": 1500,
-#   "total_bytes": 24576
+#   "max_partitions": 1024,
+#   "created_at": "2026-02-10T12:00:00+00:00"
 # }
 ```
 
@@ -145,7 +147,7 @@ info = ap.get_frame("warehouse", "sales", "orders")
 write_to_frame(hive: str, box_name: str, frame_name: str, ipc_data: bytes) -> dict
 ```
 
-Append data to a frame. Input is Arrow IPC stream bytes. Returns a write result with cell count and row count.
+Append data to a frame. Input is Arrow IPC stream bytes. Returns a write result with version, cell/row counts, bytes written, duration, and colony temperature.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -154,7 +156,7 @@ Append data to a frame. Input is Arrow IPC stream bytes. Returns a write result 
 | `frame_name` | `str` | Target frame |
 | `ipc_data` | `bytes` | Arrow IPC stream bytes |
 
-**Returns:** `{"cells_written": int, "rows_written": int}`
+**Returns:** `{"version": int, "cells_written": int, "rows_written": int, "bytes_written": int, "duration_ms": int, "temperature": float}`
 
 ```python
 import pyarrow as pa
@@ -172,7 +174,7 @@ writer.write_table(table)
 writer.close()
 
 result = ap.write_to_frame("warehouse", "sales", "orders", sink.getvalue().to_pybytes())
-# {"cells_written": 2, "rows_written": 3}
+# {"version": 1, "cells_written": 2, "rows_written": 3, "bytes_written": 4096, "duration_ms": 42, "temperature": 0.15}
 ```
 
 ### Read
@@ -255,15 +257,19 @@ result = ap.sql("SELECT * FROM orders LIMIT 10")
 status() -> dict
 ```
 
-Returns basic node information.
+Returns basic node information including hardware details and storage type.
 
 ```python
 s = ap.status()
 # {
+#   "name": "production",
 #   "node_id": "abc123",
 #   "cores": 4,
 #   "memory_gb": 3.7,
-#   "state": "running"
+#   "bees": 4,
+#   "storage": "s3",
+#   "memory_per_bee_mb": 950,
+#   "target_cell_size_mb": 237
 # }
 ```
 
@@ -273,12 +279,12 @@ s = ap.status()
 bee_status() -> list[dict]
 ```
 
-Returns per-bee (per-core) information: memory budget, current utilization, and task state.
+Returns per-bee (per-core) information: memory budget (in bytes), current utilization, and task state.
 
 ```python
 bees = ap.bee_status()
 for bee in bees:
-    print(f"Bee {bee['bee_id']}: {bee['state']} — {bee['memory_used_mb']:.0f}/{bee['memory_budget_mb']:.0f} MB")
+    print(f"Bee {bee['bee_id']}: {bee['state']} — {bee['memory_used']}/{bee['memory_budget']} bytes")
 ```
 
 ### Swarm Status
@@ -287,13 +293,15 @@ for bee in bees:
 swarm_status() -> dict
 ```
 
-Returns the full swarm view: all discovered nodes, their state (`alive`, `suspect`, or `dead`), and aggregate capacity.
+Returns the full swarm view: all discovered nodes with their state, bee count, and health metrics.
 
 ```python
 swarm = ap.swarm_status()
-print(f"Nodes alive: {swarm['alive']}, Total bees: {swarm['total_bees']}")
+print(f"Total bees: {swarm['total_bees']}, Idle bees: {swarm['total_idle_bees']}")
 for node in swarm['nodes']:
-    print(f"  {node['node_id']}: {node['state']}")
+    print(f"  {node['node_id']}: {node['state']} — {node['bees']} bees, "
+          f"mem pressure: {node['memory_pressure']:.2f}, "
+          f"temp: {node['colony_temperature']:.2f}")
 ```
 
 ### Colony Status
@@ -302,13 +310,13 @@ for node in swarm['nodes']:
 colony_status() -> dict
 ```
 
-Returns the behavioral model state: colony temperature, regulation classification, and abandonment statistics.
+Returns the behavioral model state: colony temperature, regulation classification, and setpoint.
 
 ```python
 colony = ap.colony_status()
 print(f"Temperature: {colony['temperature']:.2f}")
-print(f"Regulation: {colony['regulation']}")  # "ideal", "warm", "hot", etc.
-print(f"Abandoned tasks: {colony['abandoned_tasks']}")
+print(f"Regulation: {colony['regulation']}")  # "cold", "ideal", "warm", "hot", "critical"
+print(f"Setpoint: {colony['setpoint']:.2f}")
 ```
 
 ---

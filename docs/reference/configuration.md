@@ -13,13 +13,13 @@ The `Apiary` constructor accepts two parameters:
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `name` | `str` | (required) | Logical name for this apiary. Used as the root namespace and the default directory name for local storage. |
-| `storage` | `str \| None` | `None` | Storage URI. When `None`, uses local filesystem at `~/.apiary/{name}/`. |
+| `storage` | `str \| None` | `None` | Storage URI. When `None`, uses local filesystem at `~/.apiary/data/{name}/`. |
 
 ### Storage URI Formats
 
 | Format | Backend | Example |
 |--------|---------|---------|
-| `None` / omitted | Local filesystem | `Apiary("mydb")` -- stores at `~/.apiary/mydb/` |
+| `None` / omitted | Local filesystem | `Apiary("mydb")` -- stores at `~/.apiary/data/mydb/` |
 | `s3://bucket/path` | AWS S3 | `Apiary("prod", storage="s3://my-bucket/apiary")` |
 | `s3://bucket/path?endpoint=http://host:port` | MinIO / S3-compatible | `Apiary("prod", storage="s3://data@minio.local:9000")` |
 
@@ -56,7 +56,15 @@ RUST_LOG=info,apiary_query=debug
 # Trace storage operations
 RUST_LOG=info,apiary_storage=trace
 ```
+### Apiary Configuration
 
+| Variable | Description | Default |
+|----------|-------------|--------|
+| `APIARY_STORAGE_URL` | Storage URI for the node (e.g., `s3://apiary/data`) | (set in Docker compose) |
+| `APIARY_NAME` | Logical name for this apiary instance | `production` |
+| `APIARY_IMAGE` | Docker image tag for Apiary containers | `apiary:latest` |
+| `APIARY_VERSION` | Version to install via install scripts | `latest` |
+| `INSTALL_DIR` | Custom binary install location | `/usr/local/bin` (Linux), `$USERPROFILE\.apiary\bin` (Windows) |
 ---
 
 ## Runtime Defaults
@@ -67,7 +75,7 @@ RUST_LOG=info,apiary_storage=trace
 |-----------|---------|-------------|
 | Bee count | Auto-detected CPU cores | One bee per virtual core |
 | Memory budget per bee | Total RAM / core count | Each bee gets an equal share of available memory |
-| Task timeout | 300 seconds | Maximum time a single task can run before termination |
+| Task timeout | 30 seconds | Maximum time a single task can run before termination |
 | Scratch directory | System temp dir / bee ID | Isolated temp directory per bee for spill files |
 
 ### Cell Cache
@@ -83,7 +91,7 @@ RUST_LOG=info,apiary_storage=trace
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | Heartbeat interval | 5 seconds | How often each node writes its heartbeat file to storage |
-| Suspect threshold | 15 seconds | Node is marked `suspect` after missing this many seconds of heartbeats |
+| Suspect threshold | 15 seconds | Node is marked `suspect` after missing this many seconds of heartbeats (derived: `dead_threshold / 2`) |
 | Dead threshold | 30 seconds | Node is marked `dead` after missing this many seconds of heartbeats |
 | Stale cleanup | 60 seconds | Dead node heartbeat files are deleted after this duration |
 
@@ -93,9 +101,9 @@ RUST_LOG=info,apiary_storage=trace
 |-------|---------------|--------|
 | 0.0 -- 0.3 | Cold | System underutilized |
 | 0.3 -- 0.7 | Ideal | Normal operating range |
-| 0.7 -- 0.85 | Warm | Approaching capacity |
-| 0.85 -- 0.95 | Hot | Temperature reported to client (v2: write backpressure) |
-| 0.95 -- 1.0 | Critical | Temperature reported to client (v2: query admission control) |
+| 0.7 -- 0.85 | Warm | Approaching capacity (0.85 is classified as Warm) |
+| > 0.85 -- 0.95 | Hot | Temperature reported to client (v2: write backpressure) |
+| > 0.95 | Critical | Temperature reported to client (v2: query admission control) |
 
 Colony temperature is a composite metric derived from CPU utilization, memory pressure, and task queue depth.
 

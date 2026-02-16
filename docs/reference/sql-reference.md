@@ -157,6 +157,13 @@ List all boxes in a hive.
 SHOW BOXES IN warehouse;
 ```
 
+If a hive context is set with `USE HIVE`, you can omit `IN`:
+
+```sql
+USE HIVE warehouse;
+SHOW BOXES;
+```
+
 ### SHOW FRAMES
 
 List all frames in a box.
@@ -165,17 +172,27 @@ List all frames in a box.
 SHOW FRAMES IN warehouse.sales;
 ```
 
+If both hive and box context are set, you can omit `IN`:
+
+```sql
+USE HIVE warehouse;
+USE BOX sales;
+SHOW FRAMES;
+```
+
 ### DESCRIBE
 
-Show schema, partitions, cell count, row count, and size for a frame.
+Show metadata for a frame including schema, partitions, cell count, row count, and size.
 
 ```sql
 DESCRIBE warehouse.sales.orders;
--- Returns: column_name | data_type | partition | ...
---          order_id    | int64     | false     |
---          customer    | utf8      | false     |
---          amount      | float64   | false     |
---          region      | utf8      | true      |
+-- Returns a property/value table:
+-- property     | value
+-- schema       | {"order_id": "int64", "customer": "utf8", ...}
+-- partition_by | ["region"]
+-- cells        | 3
+-- total_rows   | 1500
+-- total_bytes  | 24576
 ```
 
 ---
@@ -190,8 +207,8 @@ These SQL statements are intentionally blocked and return clear error messages d
 | `UPDATE` | "Use `overwrite_frame()` in the Python SDK" | [`overwrite_frame()`](/docs/reference/python-sdk#overwrite) |
 | `DELETE` | "Use `overwrite_frame()` to replace data" | [`overwrite_frame()`](/docs/reference/python-sdk#overwrite) |
 | `CREATE TABLE` | "Use `create_frame()` in the Python SDK" | [`create_frame()`](/docs/reference/python-sdk#create) |
-| `DROP TABLE` | "Not yet supported" | -- |
-| `ALTER TABLE` | "Not yet supported" | -- |
+| `DROP TABLE` | "DROP is not supported via SQL. Use the registry API for DDL operations." | -- |
+| `ALTER TABLE` | "ALTER is not supported via SQL. Use the registry API for DDL operations." | -- |
 
 ---
 
