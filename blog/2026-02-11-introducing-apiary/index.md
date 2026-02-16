@@ -25,7 +25,7 @@ The key design decisions:
 
 **One core equals one bee.** Each CPU core is an isolated execution unit (a "bee") with its own memory budget. On a 4 GB Raspberry Pi, four bees each get roughly 1 GB. Memory limits are hard -- a runaway query kills one bee's task, not the entire node.
 
-**Biology-driven resource management.** Memory budgets, data cell sizing, backpressure, and failure recovery are governed by algorithms inspired by real bee colony behaviors. Mason bee sealed chambers provide execution isolation. Leafcutter bee sizing ensures data cells fit within bee memory budgets. Colony temperature drives write backpressure.
+**Biology-driven resource management.** Memory budgets, data cell sizing, and failure recovery are governed by algorithms inspired by real bee colony behaviors. Mason bee sealed chambers provide execution isolation. Leafcutter bee sizing ensures data cells fit within bee memory budgets. Colony temperature provides real-time health observability across the cluster.
 
 **Zero-configuration multi-node.** A second node joins the swarm by connecting to the same storage bucket. No seed nodes, no tokens, no mesh network setup. Nodes discover each other through heartbeat files in storage.
 

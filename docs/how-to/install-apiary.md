@@ -1,14 +1,36 @@
 ---
 title: Install Apiary
 sidebar_position: 1
-description: "How to install Apiary from source on Linux, macOS, or Raspberry Pi."
+description: "How to install Apiary on Linux, macOS, or Raspberry Pi."
 ---
 
 # Install Apiary
 
-## Prerequisites
+## Pre-built Binaries (Recommended)
 
-- **Rust 1.75+** -- Install from [rustup.rs](https://rustup.rs/)
+The fastest way to install Apiary on Linux or macOS:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ApiaryData/apiary/main/scripts/install.sh | bash
+```
+
+This downloads a pre-built binary from GitHub Releases, detects your platform (x86_64 or ARM64), and installs to `/usr/local/bin`.
+
+You can customize the install:
+
+```bash
+# Specific version
+APIARY_VERSION=0.1.0 curl -fsSL https://raw.githubusercontent.com/ApiaryData/apiary/main/scripts/install.sh | bash
+
+# Custom install directory
+INSTALL_DIR=~/.local/bin curl -fsSL https://raw.githubusercontent.com/ApiaryData/apiary/main/scripts/install.sh | bash
+```
+
+For Windows, see [Install on Windows](/docs/how-to/install-windows).
+
+## Prerequisites (Building from Source)
+
+- **Rust (stable)** -- Install from [rustup.rs](https://rustup.rs/)
 - **Python 3.9+** -- System Python or a virtual environment
 - **maturin** -- Python build tool for Rust extensions
 

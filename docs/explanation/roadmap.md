@@ -34,7 +34,6 @@ v1 proves the fundamental thesis: a distributed data platform can run on Raspber
 - Full SELECT with WHERE, GROUP BY, HAVING, ORDER BY, LIMIT, JOIN
 - Custom commands: USE, SHOW, DESCRIBE
 - Projection pushdown
-- EXPLAIN and EXPLAIN ANALYZE
 
 **Multi-Node:**
 - Storage-based heartbeat and world view
@@ -103,6 +102,7 @@ v2 adds direct communication between nodes for workloads that require low latenc
 - Full CLI with interactive shell
 - Metrics export (Prometheus format)
 - Alerting hooks
+- EXPLAIN and EXPLAIN ANALYZE query plan inspection
 
 ## v3 -- Enterprise and Federation
 
